@@ -1,0 +1,12 @@
+{
+	"code": [
+		"SharingPlugin.h",
+		"SharingPlugin.mm"
+	],
+	"frameworks": [
+	],
+	"userDefined": [
+	],
+	"plist": {
+	}
+}
