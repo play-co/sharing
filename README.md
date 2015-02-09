@@ -5,6 +5,8 @@ devkit plugin for accessing native share
 
 **WARNING:** iOS Support Only
 
+![devkit_sharing](https://cloud.githubusercontent.com/assets/4285147/6118630/76cadad8-b074-11e4-9c87-cb76b792e341.png)
+
 ## Usage
 
 ### Installation
