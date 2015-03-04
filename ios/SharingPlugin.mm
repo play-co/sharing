@@ -10,17 +10,24 @@ static UIViewController* rootViewController = nil;
 // -----------------------------------------------------------------------------
 
 - (void) share:(NSDictionary*)opts withRequestId:(NSNumber*)requestId {
-    NSString* message = opts[@"message"];
     UIImage* image = nil;
-    
+    NSURL* url = nil;
+    NSString* message = opts[@"message"];
     NSMutableArray* items = [[NSMutableArray alloc] initWithArray:@[message]];
-    
+
+    if (opts[@"url"]) {
+      // URLWithString will return nil if url is malformed
+      url = [NSURL URLWithString:opts[@"url"]];
+      if (url != nil) {
+        [items addObject:url];
+      }
+    }
+
     if (opts[@"image"]) {
         NSData* imageData = [[NSData alloc] initWithBase64EncodedString:opts[@"image"] options:0];
         image = [[UIImage alloc] initWithData:imageData];
         [items addObject:image];
     }
-
 
     // Create view controller for the activity
     UIActivityViewController* activityVC = [[UIActivityViewController alloc]
@@ -31,21 +38,17 @@ static UIViewController* rootViewController = nil;
     activityVC.excludedActivityTypes = @[UIActivityTypeAirDrop,
                                          UIActivityTypePrint,
                                          UIActivityTypeAssignToContact];
-    
+
     [activityVC setCompletionWithItemsHandler:^(NSString *activityType,
                                                 BOOL completed,
                                                 NSArray *returnedItems,
                                                 NSError *activityError) {
-        
+
         [[PluginManager get] dispatchJSResponse:@{@"completed": [NSNumber numberWithBool:completed]}
                                       withError:nil
                                    andRequestId:requestId];
 
     }];
-    
-//    [activityVC setCompletionHandler:^(NSString *activityType, BOOL completed){
-
-//    }];
 
     [rootViewController presentViewController:activityVC
                                      animated:YES
