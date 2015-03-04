@@ -6,7 +6,7 @@
 
 exports = {
   share: function (opts, cb) {
-    logger.debug('{Sharing} share');
+    window.open(opts.image, '_blank');
     setTimeout(function () {
       cb && cb(true);
     });
