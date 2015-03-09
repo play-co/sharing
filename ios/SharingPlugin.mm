@@ -3,6 +3,41 @@
 
 static UIViewController* rootViewController = nil;
 
+
+/**
+ * Code from
+ * http://stackoverflow.com/questions/7905432/how-to-get-orientation-dependent-height-and-width-of-the-screen
+ * for orientation dependent width/height to center on iPad.
+ */
+@interface UIApplication (AppDimensions)
++(CGSize) currentSize;
++(CGSize) sizeInOrientation:(UIInterfaceOrientation)orientation;
+@end
+
+@implementation UIApplication (AppDimensions)
+
++(CGSize) currentSize
+{
+  return [UIApplication sizeInOrientation:[UIApplication sharedApplication].statusBarOrientation];
+}
+
++(CGSize) sizeInOrientation:(UIInterfaceOrientation)orientation
+{
+  CGSize size = [UIScreen mainScreen].bounds.size;
+  UIApplication *application = [UIApplication sharedApplication];
+  if (UIInterfaceOrientationIsLandscape(orientation))
+  {
+    size = CGSizeMake(size.height, size.width);
+  }
+  if (application.statusBarHidden == NO)
+  {
+    size.height -= MIN(application.statusBarFrame.size.width, application.statusBarFrame.size.height);
+  }
+  return size;
+}
+
+@end
+
 @implementation SharingPlugin
 
 // -----------------------------------------------------------------------------
@@ -39,16 +74,27 @@ static UIViewController* rootViewController = nil;
                                          UIActivityTypePrint,
                                          UIActivityTypeAssignToContact];
 
-    [activityVC setCompletionWithItemsHandler:^(NSString *activityType,
-                                                BOOL completed,
-                                                NSArray *returnedItems,
-                                                NSError *activityError) {
+    // iOS 8 and later
+    if ([activityVC respondsToSelector:@selector(setCompletionWithItemsHandler:)]) {
+      [activityVC setCompletionWithItemsHandler:^(NSString *activityType,
+                                                  BOOL completed,
+                                                  NSArray *returnedItems,
+                                                  NSError *activityError) {
 
         [[PluginManager get] dispatchJSResponse:@{@"completed": [NSNumber numberWithBool:completed]}
                                       withError:nil
                                    andRequestId:requestId];
 
-    }];
+      }];
+    } else {
+      // iOS 7 / earlier
+      [activityVC setCompletionHandler:^(NSString *activityType, BOOL completed) {
+        [[PluginManager get] dispatchJSResponse:@{@"completed": [NSNumber numberWithBool:completed]}
+                                      withError:nil
+                                   andRequestId:requestId];
+      }];
+    }
+
 
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
       // iPhone
@@ -57,7 +103,11 @@ static UIViewController* rootViewController = nil;
       // iPad
       // Change Rect to position Popover
       UIPopoverController *popup = [[UIPopoverController alloc] initWithContentViewController:activityVC];
-      [popup presentPopoverFromRect:CGRectMake(rootViewController.view.frame.size.width/2, rootViewController.view.frame.size.height * .95, 0, 0)
+      CGSize size = [UIApplication currentSize];
+      CGFloat x = size.width / 2;
+      CGFloat y = size.height * 0.95;
+
+      [popup presentPopoverFromRect:CGRectMake(x - 1, y, 2, 1)
                              inView:rootViewController.view
            permittedArrowDirections:UIPopoverArrowDirectionDown
                            animated:YES];
