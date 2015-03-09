@@ -50,9 +50,18 @@ static UIViewController* rootViewController = nil;
 
     }];
 
-    [rootViewController presentViewController:activityVC
-                                     animated:YES
-                                   completion:nil];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+      // iPhone
+      [rootViewController presentViewController:activityVC animated:YES completion:nil];
+    } else {
+      // iPad
+      // Change Rect to position Popover
+      UIPopoverController *popup = [[UIPopoverController alloc] initWithContentViewController:activityVC];
+      [popup presentPopoverFromRect:CGRectMake(rootViewController.view.frame.size.width/2, rootViewController.view.frame.size.height * .95, 0, 0)
+                             inView:rootViewController.view
+           permittedArrowDirections:UIPopoverArrowDirectionDown
+                           animated:YES];
+    }
 }
 
 // -----------------------------------------------------------------------------
