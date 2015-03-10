@@ -1,0 +1,9 @@
+{
+		"copyFiles": [
+			"SharingPlugin.java"
+		],
+		"libraries": [
+		],
+		"jars": [
+		]
+}

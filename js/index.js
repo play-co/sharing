@@ -49,7 +49,7 @@ properties.forEach(function (name) {
 
 propertiesObject.impl = {
   get: function () {
-    if (device.isMobileNative && device.isIOS) {
+    if (device.isMobileNative) {
       return native;
     }
     return browser;

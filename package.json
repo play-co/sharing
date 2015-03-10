@@ -6,7 +6,8 @@
       "Sharing": "js"
     },
     "extensions": {
-      "ios": "ios"
+      "ios": "ios",
+      "android": "android"
     }
   },
   "devDependencies": {
