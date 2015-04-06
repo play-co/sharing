@@ -26,7 +26,7 @@ Sharing.share({
   url: '', // optional url to add to the message
   title: '', // optional title for sharing (helpful on android)
   image: '', // optional data uri - see test app for demo
-  instructions: '', optional header for share dialog on android
+  instructions: '', // optional header for share dialog on android
 
   filename: '' // optional  temp image filename on android (should end in .png)
 }, function (completed) {
